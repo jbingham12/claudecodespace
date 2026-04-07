@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEAD SIGNAL — Escape Room</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --green: #00ff88;
+    --dim-green: #004422;
+    --red: #ff3344;
+    --amber: #ffaa00;
+    --bg: #050a08;
+    --panel: #0a120e;
+    --border: #1a3a2a;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--green);
+    font-family: 'Courier New', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.15) 2px,
+      rgba(0,0,0,0.15) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* CRT flicker */
+  @keyframes flicker {
+    0%,100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: 0.85; }
+    94% { opacity: 1; }
+    96% { opacity: 0.9; }
+    97% { opacity: 1; }
+  }
+  body { animation: flicker 8s infinite; }
+
+  /* Hull shake */
+  @keyframes shake {
+    0%,100% { transform: translate(0,0); }
+    25% { transform: translate(-2px, 1px); }
+    75% { transform: translate(2px, -1px); }
+  }
+
+  #game { max-width: 1100px; margin: 0 auto; padding: 20px; }
+
+  /* Header */
+  #header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+  }
+  #title { font-size: 1.4em; letter-spacing: 0.3em; color: var(--amber); }
+  #timer {
+    font-size: 2em;
+    color: var(--red);
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 10px var(--red);
+  }
+  #status-bar {
+    font-size: 0.75em;
+    color: #556655;
+    letter-spacing: 0.15em;
+  }
+
+  /* Grid layout */
+  #panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 16px;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+  .panel.solved { border-color: var(--green); box-shadow: 0 0 12px rgba(0,255,136,0.15); }
+  .panel.locked { opacity: 0.4; pointer-events: none; }
+
+  .panel-label {
+    font-size: 0.65em;
+    letter-spacing: 0.25em;
+    color: #445544;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+  .panel.solved .panel-label { color: var(--green); }
+
+  .solved-stamp {
+    display: none;
+    position: absolute;
+    top: 12px; right: 14px;
+    color: var(--green);
+    font-size: 0.7em;
+    letter-spacing: 0.2em;
+    text-shadow: 0 0 8px var(--green);
+  }
+  .panel.solved .solved-stamp { display: block; }
+
+  /* ══════════════════════════════════════
+     PUZZLE 1 — WAVEFORM ALIGNMENT
+  ══════════════════════════════════════ */
+  #p1 { grid-column: 1; grid-row: 1; }
+
+  .waveform-wrapper {
+    position: relative;
+    height: 80px;
+    background: #030808;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  canvas#wave-target, canvas#wave-player {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .sliders { display: flex; gap: 12px; margin-bottom: 12px; }
+  .slider-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .slider-group label { font-size: 0.65em; color: #445544; letter-spacing: 0.1em; }
+  input[type=range] {
+    width: 100%;
+    accent-color: var(--green);
+    cursor: pointer;
+  }
+
+  #p1-btn {
+    width: 100%;
+    padding: 8px;
+    background: transparent;
+    border: 1px solid var(--dim-green);
+    color: var(--green);
+    font-family: inherit;
+    font-size: 0.8em;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  #p1-btn:hover { background: var(--dim-green); border-color: var(--green); }
+
+  /* ══════════════════════════════════════
+     PUZZLE 2 — CREW MANIFEST CIPHER
+  ══════════════════════════════════════ */
+  #p2 { grid-column: 2; grid-row: 1; }
+
+  .manifest-clue {
+    font-size: 0.72em;
+    color: #667766;
+    line-height: 1.8;
+    margin-bottom: 14px;
+    padding: 10px;
+    background: #030808;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+  .manifest-clue .highlight { color: var(--amber); }
+
+  .manifest-inputs { display: flex; flex-direction: column; gap: 8px; }
+  .manifest-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.75em;
+  }
+  .manifest-row .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #223322;
+    border: 1px solid #334433;
+    transition: all 0.4s;
+    flex-shrink: 0;
+  }
+  .manifest-row .dot.lit { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .manifest-row input {
+    background: #030808;
+    border: 1px solid var(--border);
+    color: var(--green);
+    font-family: inherit;
+    font-size: 1em;
+    padding: 4px 8px;
+    width: 120px;
+    letter-spacing: 0.1em;
+    outline: none;
+  }
+  .manifest-row input:focus { border-color: var(--green); }
+  .manifest-row .label { color: #445544; flex: 1; }
+
+  /* ══════════════════════════════════════
+     PUZZLE 3 — VALVE SEQUENCING
+  ══════════════════════════════════════ */
+  #p3 { grid-column: 1; grid-row: 2; }
+
+  .valve-clue {
+    font-size: 0.7em;
+    color: #667766;
+    margin-bottom: 12px;
+    line-height: 1.6;
+  }
+  .valve-clue .star { color: var(--amber); }
+
+  .valves {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .valve {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: 2px solid #334433;
+    background: #030808;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 0.8em;
+    color: #445544;
+    transition: all 0.2s;
+    user-select: none;
+    position: relative;
+  }
+  .valve:hover { border-color: var(--amber); color: var(--amber); }
+  .valve.active { background: #1a3a1a; border-color: var(--green); color: var(--green); box-shadow: 0 0 8px rgba(0,255,136,0.3); }
+  .valve.wrong { border-color: var(--red); color: var(--red); animation: wrongFlash 0.4s; }
+  @keyframes wrongFlash { 0%,100%{background:#030808;} 50%{background:#1a0005;} }
+  .valve .seq-num {
+    position: absolute;
+    top: -8px; right: -4px;
+    font-size: 0.65em;
+    color: var(--amber);
+    display: none;
+  }
+  .valve.active .seq-num { display: block; }
+
+  .co2-bar-wrap { margin-top: 8px; }
+  .co2-label { font-size: 0.65em; color: #445544; margin-bottom: 4px; letter-spacing: 0.1em; }
+  .co2-bar {
+    height: 8px;
+    background: #030808;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .co2-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--red);
+    transition: width 0.3s;
+    box-shadow: 0 0 6px var(--red);
+  }
+
+  /* ══════════════════════════════════════
+     PUZZLE 4 — BINARY REPAIR
+  ══════════════════════════════════════ */
+  #p4 { grid-column: 2; grid-row: 2; }
+  #p4.locked { opacity: 0.35; pointer-events: none; }
+
+  .binary-clue {
+    font-size: 0.68em;
+    color: #667766;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .binary-display {
+    font-size: 0.82em;
+    line-height: 2;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+    background: #030808;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    word-break: break-all;
+  }
+  .bit {
+    cursor: pointer;
+    padding: 1px 2px;
+    border-radius: 2px;
+    transition: all 0.15s;
+    display: inline-block;
+  }
+  .bit:hover { background: rgba(0,255,136,0.15); }
+  .bit.correct { color: var(--green); text-shadow: 0 0 6px var(--green); cursor: default; }
+  .bit.wrong-bit { color: var(--red); }
+
+  .decoded-output {
+    font-size: 0.78em;
+    color: #445544;
+    min-height: 24px;
+    letter-spacing: 0.15em;
+    transition: color 0.5s;
+  }
+  .decoded-output.revealed { color: var(--amber); text-shadow: 0 0 8px var(--amber); }
+
+  /* ══════════════════════════════════════
+     WIN / LOSE SCREENS
+  ══════════════════════════════════════ */
+  #overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  #overlay.show { display: flex; }
+  #overlay h1 { font-size: 3em; letter-spacing: 0.3em; }
+  #overlay.win h1 { color: var(--green); text-shadow: 0 0 30px var(--green); }
+  #overlay.lose h1 { color: var(--red); text-shadow: 0 0 30px var(--red); }
+  #overlay p { color: #667766; font-size: 0.9em; letter-spacing: 0.1em; max-width: 400px; }
+  #overlay button {
+    padding: 12px 32px;
+    background: transparent;
+    border: 1px solid currentColor;
+    color: inherit;
+    font-family: inherit;
+    font-size: 0.9em;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  #overlay.win button { color: var(--green); }
+  #overlay.lose button { color: var(--red); }
+
+  /* Narrative */
+  #narrative {
+    font-size: 0.72em;
+    color: #445544;
+    line-height: 1.7;
+    padding: 12px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    border-radius: 4px;
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+  }
+  #narrative .em { color: var(--amber); }
+</style>
+</head>
+<body>
+
+<div id="game">
+  <div id="header">
+    <div>
+      <div id="title">// DEAD SIGNAL</div>
+      <div id="status-bar">AETHON-7 · SECTOR 9 · LIFE SUPPORT: CRITICAL</div>
+    </div>
+    <div id="timer">15:00</div>
+  </div>
+
+  <div id="narrative">
+    You are the only conscious crew member aboard the <span class="em">AETHON-7</span>.
+    A micrometeorite strike has severed main power. The ship's AI, <span class="em">CASS</span>, is fragmented across four isolated terminals.
+    Restore all four systems before life support fails — you have <span class="em">15 minutes</span>.
+  </div>
+
+  <div id="panels">
+    <!-- P1: Waveform -->
+    <div class="panel" id="p1">
+      <div class="panel-label">TERMINAL A · REACTOR FREQUENCY</div>
+      <div class="solved-stamp">[ ONLINE ]</div>
+      <div class="waveform-wrapper">
+        <canvas id="wave-target"></canvas>
+        <canvas id="wave-player"></canvas>
+      </div>
+      <div class="sliders">
+        <div class="slider-group">
+          <label>FREQ-α</label>
+          <input type="range" id="s1" min="1" max="10" value="5">
+        </div>
+        <div class="slider-group">
+          <label>FREQ-β</label>
+          <input type="range" id="s2" min="1" max="10" value="5">
+        </div>
+        <div class="slider-group">
+          <label>FREQ-γ</label>
+          <input type="range" id="s3" min="1" max="10" value="5">
+        </div>
+      </div>
+      <button id="p1-btn" onclick="checkWave()">ALIGN FREQUENCY</button>
+    </div>
+
+    <!-- P2: Crew Manifest -->
+    <div class="panel" id="p2">
+      <div class="panel-label">TERMINAL B · CREW MANIFEST CIPHER</div>
+      <div class="solved-stamp">[ ONLINE ]</div>
+      <div class="manifest-clue">
+        CASS fragment recovered. Cross-reference crew roster.<br>
+        Missing entries block authentication.<br><br>
+        <span class="highlight">HINT: The 3rd planet from our sun · A red planet · The ringed one</span>
+      </div>
+      <div class="manifest-inputs">
+        <div class="manifest-row">
+          <div class="dot" id="d1"></div>
+          <input id="m1" type="text" placeholder="CREW-01" maxlength="10" oninput="checkManifest()">
+          <span class="label">· Navigator</span>
+        </div>
+        <div class="manifest-row">
+          <div class="dot" id="d2"></div>
+          <input id="m2" type="text" placeholder="CREW-02" maxlength="10" oninput="checkManifest()">
+          <span class="label">· Engineer</span>
+        </div>
+        <div class="manifest-row">
+          <div class="dot" id="d3"></div>
+          <input id="m3" type="text" placeholder="CREW-03" maxlength="10" oninput="checkManifest()">
+          <span class="label">· Medic</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- P3: Valve Sequencing -->
+    <div class="panel" id="p3">
+      <div class="panel-label">TERMINAL C · AIRLOCK PRESSURE</div>
+      <div class="solved-stamp">[ ONLINE ]</div>
+      <div class="valve-clue">
+        Activate valves in the correct sequence.<br>
+        <span class="star">★★★ · ★ · ★★★★ · ★★ · ★★★★★ · ★★★★★★</span><br>
+        <span style="font-size:0.85em;color:#445544;">(star count = valve number, left to right)</span>
+      </div>
+      <div class="valves" id="valves">
+        <div class="valve" id="v1" onclick="toggleValve(1)">V1<span class="seq-num" id="vn1"></span></div>
+        <div class="valve" id="v2" onclick="toggleValve(2)">V2<span class="seq-num" id="vn2"></span></div>
+        <div class="valve" id="v3" onclick="toggleValve(3)">V3<span class="seq-num" id="vn3"></span></div>
+        <div class="valve" id="v4" onclick="toggleValve(4)">V4<span class="seq-num" id="vn4"></span></div>
+        <div class="valve" id="v5" onclick="toggleValve(5)">V5<span class="seq-num" id="vn5"></span></div>
+        <div class="valve" id="v6" onclick="toggleValve(6)">V6<span class="seq-num" id="vn6"></span></div>
+      </div>
+      <div class="co2-bar-wrap">
+        <div class="co2-label">CO₂ LEVEL (%)</div>
+        <div class="co2-bar"><div class="co2-fill" id="co2-fill"></div></div>
+      </div>
+    </div>
+
+    <!-- P4: Binary Repair -->
+    <div class="panel locked" id="p4">
+      <div class="panel-label">TERMINAL D · CASS MEMORY CORE</div>
+      <div class="solved-stamp">[ ONLINE ]</div>
+      <div class="binary-clue">
+        CASS final fragment. Corrupted bits marked <span style="color:var(--red)">red</span>.
+        Click each corrupted bit to flip it. Restore the ASCII message to unlock the emergency hatch.
+      </div>
+      <div class="binary-display" id="binary-display"></div>
+      <div class="decoded-output" id="decoded-out">[ AWAITING REPAIR... ]</div>
+    </div>
+  </div>
+</div>
+
+<!-- Win/Lose Overlay -->
+<div id="overlay">
+  <h1 id="overlay-title"></h1>
+  <p id="overlay-msg"></p>
+  <button onclick="resetGame()">RESTART MISSION</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let solved = { p1: false, p2: false, p3: false, p4: false };
+let timeLeft = 900; // 15 min in seconds
+let timerInterval = null;
+let valveSequence = [];
+let valveErrors = 0;
+const CORRECT_VALVE_ORDER = [3, 1, 4, 2, 6, 5]; // derived from star counts: 3,1,4,2,5,6
+// Wait — star clue: ★★★ · ★ · ★★★★ · ★★ · ★★★★★ · ★★★★★★ = 3,1,4,2,5,6
+const VALVE_ORDER = [3, 1, 4, 2, 5, 6];
+
+// ═══════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      showLose();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+  const s = (timeLeft % 60).toString().padStart(2, '0');
+  const el = document.getElementById('timer');
+  el.textContent = `${m}:${s}`;
+  if (timeLeft < 120) el.style.animation = 'flicker 0.5s infinite';
+}
+
+// ═══════════════════════════════════════
+// HULL SHAKE
+// ═══════════════════════════════════════
+setInterval(() => {
+  document.getElementById('game').style.animation = 'shake 0.2s';
+  setTimeout(() => document.getElementById('game').style.animation = '', 300);
+}, 25000 + Math.random() * 15000);
+
+// ═══════════════════════════════════════
+// PUZZLE 1 — WAVEFORM
+// ═══════════════════════════════════════
+const TARGET = { s1: 7, s2: 3, s3: 8 };
+
+function drawWave(canvas, values, color, alpha) {
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = alpha;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  const w = canvas.width, h = canvas.height, mid = h / 2;
+  for (let x = 0; x < w; x++) {
+    const t = (x / w) * Math.PI * 2;
+    const y = mid
+      + Math.sin(t * values.s1) * (h * 0.18)
+      + Math.sin(t * values.s2 * 0.7) * (h * 0.12)
+      + Math.cos(t * values.s3 * 0.5) * (h * 0.10);
+    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+}
+
+function renderWaves() {
+  drawWave(document.getElementById('wave-target'), TARGET, '#ffaa00', 0.7);
+  const vals = {
+    s1: +document.getElementById('s1').value,
+    s2: +document.getElementById('s2').value,
+    s3: +document.getElementById('s3').value
+  };
+  drawWave(document.getElementById('wave-player'), vals, '#00ff88', 0.9);
+}
+
+['s1','s2','s3'].forEach(id => {
+  document.getElementById(id).addEventListener('input', renderWaves);
+});
+
+function checkWave() {
+  const v1 = +document.getElementById('s1').value;
+  const v2 = +document.getElementById('s2').value;
+  const v3 = +document.getElementById('s3').value;
+  if (v1 === TARGET.s1 && v2 === TARGET.s2 && v3 === TARGET.s3) {
+    solvePanel('p1');
+  } else {
+    const btn = document.getElementById('p1-btn');
+    btn.textContent = 'MISALIGNED — RETRY';
+    btn.style.borderColor = 'var(--red)';
+    btn.style.color = 'var(--red)';
+    setTimeout(() => {
+      btn.textContent = 'ALIGN FREQUENCY';
+      btn.style.borderColor = 'var(--dim-green)';
+      btn.style.color = 'var(--green)';
+    }, 1200);
+  }
+}
+
+// ═══════════════════════════════════════
+// PUZZLE 2 — MANIFEST
+// ═══════════════════════════════════════
+const MANIFEST_ANSWERS = ['EARTH', 'MARS', 'SATURN'];
+
+function checkManifest() {
+  let allCorrect = true;
+  MANIFEST_ANSWERS.forEach((ans, i) => {
+    const input = document.getElementById(`m${i+1}`);
+    const dot = document.getElementById(`d${i+1}`);
+    const val = input.value.toUpperCase().trim();
+    if (val === ans) {
+      dot.classList.add('lit');
+      input.style.borderColor = 'var(--green)';
+    } else {
+      dot.classList.remove('lit');
+      input.style.borderColor = 'var(--border)';
+      allCorrect = false;
+    }
+  });
+  if (allCorrect) solvePanel('p2');
+}
+
+// ═══════════════════════════════════════
+// PUZZLE 3 — VALVES
+// ═══════════════════════════════════════
+function toggleValve(num) {
+  if (solved.p3) return;
+  const expectedNext = VALVE_ORDER[valveSequence.length];
+  if (num === expectedNext) {
+    valveSequence.push(num);
+    const v = document.getElementById(`v${num}`);
+    v.classList.add('active');
+    document.getElementById(`vn${num}`).textContent = valveSequence.length;
+    if (valveSequence.length === VALVE_ORDER.length) {
+      setTimeout(() => solvePanel('p3'), 300);
+    }
+  } else {
+    valveErrors++;
+    const pct = Math.min(valveErrors * 12, 100);
+    document.getElementById('co2-fill').style.width = pct + '%';
+    const v = document.getElementById(`v${num}`);
+    v.classList.add('wrong');
+    setTimeout(() => v.classList.remove('wrong'), 500);
+    // reset sequence
+    valveSequence = [];
+    document.querySelectorAll('.valve').forEach(el => {
+      el.classList.remove('active');
+    });
+    document.querySelectorAll('.seq-num').forEach(el => el.textContent = '');
+    if (valveErrors >= 8) {
+      clearInterval(timerInterval);
+      showLose();
+    }
+  }
+}
+
+// ═══════════════════════════════════════
+// PUZZLE 4 — BINARY
+// ═══════════════════════════════════════
+// "OPEN HATCH" in ASCII binary
+const TARGET_MSG = "OPEN HATCH";
+const CORRUPT_INDICES = [3, 7, 12, 18, 22, 29, 35, 41]; // positions to corrupt
+
+function msgToBinary(msg) {
+  return msg.split('').map(c => {
+    const b = c.charCodeAt(0).toString(2).padStart(8, '0');
+    return b;
+  }).join(' ');
+}
+
+let binaryState = [];
+
+function initBinary() {
+  const correct = msgToBinary(TARGET_MSG).replace(/ /g, '');
+  const chars = correct.split('');
+  // corrupt specific bits
+  CORRUPT_INDICES.forEach(i => {
+    if (i < chars.length) chars[i] = chars[i] === '1' ? '0' : '1';
+  });
+  binaryState = chars.map((bit, i) => ({
+    bit,
+    correct: correct[i],
+    isCorrupt: CORRUPT_INDICES.includes(i),
+    fixed: false
+  }));
+  renderBinary();
+}
+
+function renderBinary() {
+  const display = document.getElementById('binary-display');
+  // group into bytes with spaces
+  let html = '';
+  binaryState.forEach((b, i) => {
+    if (i > 0 && i % 8 === 0) html += ' ';
+    const cls = b.fixed ? 'bit correct' : (b.isCorrupt && !b.fixed ? 'bit wrong-bit' : 'bit');
+    const clickable = b.isCorrupt && !b.fixed;
+    html += `<span class="${cls}" ${clickable ? `onclick="flipBit(${i})"` : ''}>${b.bit}</span>`;
+  });
+  display.innerHTML = html;
+  checkBinary();
+}
+
+function flipBit(i) {
+  if (binaryState[i].fixed) return;
+  binaryState[i].bit = binaryState[i].bit === '1' ? '0' : '1';
+  if (binaryState[i].bit === binaryState[i].correct) {
+    binaryState[i].fixed = true;
+    binaryState[i].isCorrupt = false;
+  }
+  renderBinary();
+}
+
+function checkBinary() {
+  const allFixed = binaryState.every(b => b.bit === b.correct);
+  const out = document.getElementById('decoded-out');
+  // partially decode
+  const bytes = [];
+  for (let i = 0; i < binaryState.length; i += 8) {
+    const byte = binaryState.slice(i, i+8).map(b => b.bit).join('');
+    const charCode = parseInt(byte, 2);
+    bytes.push(charCode >= 32 && charCode < 127 ? String.fromCharCode(charCode) : '?');
+  }
+  out.textContent = '[ ' + bytes.join('') + ' ]';
+  if (allFixed) {
+    out.classList.add('revealed');
+    setTimeout(() => solvePanel('p4'), 600);
+  }
+}
+
+// ═══════════════════════════════════════
+// SOLVE / WIN / LOSE
+// ═══════════════════════════════════════
+function solvePanel(id) {
+  if (solved[id]) return;
+  solved[id] = true;
+  document.getElementById(id).classList.add('solved');
+  document.getElementById(id).classList.remove('locked');
+
+  // unlock p4 only after p1+p2+p3 done
+  if (id !== 'p4' && solved.p1 && solved.p2 && solved.p3) {
+    document.getElementById('p4').classList.remove('locked');
+  }
+
+  if (solved.p1 && solved.p2 && solved.p3 && solved.p4) {
+    clearInterval(timerInterval);
+    setTimeout(showWin, 800);
+  }
+}
+
+function showWin() {
+  const overlay = document.getElementById('overlay');
+  overlay.className = 'show win';
+  document.getElementById('overlay-title').textContent = 'SYSTEMS RESTORED';
+  document.getElementById('overlay-msg').textContent =
+    `CASS online. Life support stable. You escaped with ${formatTime(timeLeft)} remaining.`;
+}
+
+function showLose() {
+  const overlay = document.getElementById('overlay');
+  overlay.className = 'show lose';
+  document.getElementById('overlay-title').textContent = 'SIGNAL LOST';
+  document.getElementById('overlay-msg').textContent =
+    'Life support failed. CASS went dark. The AETHON-7 drifts in silence.';
+}
+
+function formatTime(s) {
+  const m = Math.floor(s/60).toString().padStart(2,'0');
+  const sec = (s%60).toString().padStart(2,'0');
+  return `${m}:${sec}`;
+}
+
+function resetGame() {
+  location.reload();
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+window.addEventListener('load', () => {
+  renderWaves();
+  initBinary();
+  startTimer();
+  // Initial wave render after layout
+  setTimeout(renderWaves, 100);
+});
+
+window.addEventListener('resize', renderWaves);
+</script>
+</body>
+</html>
