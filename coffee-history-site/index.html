@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>From Forest Fruit to Global Ritual — A Visual History of Coffee</title>
+  <meta name="description" content="A responsive single-page visual history of coffee: origins, trade, coffeehouses, plantations, espresso culture, and the specialty era." />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #130c08;
+      --bg2: #21140c;
+      --ink: #fff4df;
+      --muted: #d6b98d;
+      --soft: rgba(255, 244, 223, .72);
+      --line: rgba(255, 244, 223, .18);
+      --coffee: #7b3f1d;
+      --roast: #b56b36;
+      --cream: #ffd99b;
+      --leaf: #8ca65b;
+      --berry: #d44d35;
+      --blue: #8fc8d9;
+      --shadow: 0 24px 80px rgba(0,0,0,.45);
+      --radius: 28px;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 18% 10%, rgba(212,77,53,.32), transparent 32rem),
+        radial-gradient(circle at 82% 0%, rgba(181,107,54,.42), transparent 28rem),
+        radial-gradient(circle at 50% 72%, rgba(140,166,91,.20), transparent 34rem),
+        linear-gradient(140deg, var(--bg), #100906 48%, #2b170d);
+      color: var(--ink);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .18;
+      mix-blend-mode: overlay;
+      background-image:
+        repeating-radial-gradient(circle at 25% 30%, rgba(255,255,255,.08) 0 1px, transparent 1px 5px),
+        repeating-linear-gradient(115deg, rgba(255,255,255,.04) 0 1px, transparent 1px 7px);
+      z-index: 5;
+    }
+
+    header {
+      position: relative;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: 6rem 1.25rem 4rem;
+      overflow: hidden;
+    }
+
+    nav {
+      position: fixed;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      gap: .35rem;
+      padding: .45rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(19,12,8,.66);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 12px 40px rgba(0,0,0,.2);
+      max-width: calc(100vw - 1rem);
+      overflow-x: auto;
+    }
+    nav a {
+      color: var(--soft);
+      text-decoration: none;
+      font-size: .82rem;
+      white-space: nowrap;
+      padding: .62rem .85rem;
+      border-radius: 999px;
+      transition: color .2s, background .2s;
+    }
+    nav a:hover, nav a:focus-visible { color: var(--ink); background: rgba(255,244,223,.1); outline: none; }
+
+    .hero {
+      width: min(1180px, 100%);
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: clamp(2rem, 5vw, 5rem);
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      color: var(--cream);
+      border: 1px solid rgba(255,217,155,.26);
+      background: rgba(255,217,155,.08);
+      border-radius: 999px;
+      padding: .5rem .75rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-size: .72rem;
+    }
+    h1 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(3.4rem, 9vw, 8.8rem);
+      line-height: .86;
+      letter-spacing: -.075em;
+      margin: 1.1rem 0 1.35rem;
+      text-wrap: balance;
+    }
+    .hero p {
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      line-height: 1.62;
+      color: var(--soft);
+      max-width: 58ch;
+      margin: 0 0 1.5rem;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: .85rem; align-items: center; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      min-height: 44px;
+      border-radius: 999px;
+      padding: .85rem 1rem;
+      background: var(--cream);
+      color: #241307;
+      text-decoration: none;
+      font-weight: 800;
+      box-shadow: 0 14px 35px rgba(255,217,155,.16);
+    }
+    .button.secondary { background: rgba(255,244,223,.08); color: var(--ink); border: 1px solid var(--line); box-shadow: none; }
+
+    .cup-stage {
+      position: relative;
+      min-height: min(68vh, 680px);
+      display: grid;
+      place-items: center;
+      filter: drop-shadow(0 45px 80px rgba(0,0,0,.5));
+    }
+    .cup {
+      width: min(420px, 76vw);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, #2b1309 0 37%, #623015 38% 45%, #e3bd7b 46% 49%, #fff0d0 50% 56%, #a55b2f 57% 58%, #2e170d 59% 100%);
+      border: 2px solid rgba(255,244,223,.24);
+      animation: float 7s ease-in-out infinite;
+      position: relative;
+    }
+    .cup::before, .cup::after {
+      content: "";
+      position: absolute;
+      inset: 19%;
+      border-radius: 45% 55% 48% 52%;
+      border: 2px solid rgba(255,217,155,.28);
+      animation: swirl 14s linear infinite;
+    }
+    .cup::after { inset: 27%; animation-duration: 9s; animation-direction: reverse; opacity: .55; }
+    .steam {
+      position: absolute;
+      width: 12px;
+      height: 120px;
+      border-radius: 999px;
+      background: linear-gradient(transparent, rgba(255,244,223,.35), transparent);
+      filter: blur(8px);
+      top: 8%;
+      animation: steam 3.5s ease-in-out infinite;
+    }
+    .steam.s1 { left: 37%; }
+    .steam.s2 { left: 50%; animation-delay: .7s; height: 150px; }
+    .steam.s3 { left: 62%; animation-delay: 1.3s; }
+    .bean {
+      position: absolute;
+      width: 72px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b1a0c, #9d552c 52%, #2a1208);
+      border: 1px solid rgba(255,217,155,.18);
+      transform: rotate(var(--r));
+      opacity: .88;
+    }
+    .bean::after { content:""; position:absolute; inset: 9px 31px; border-radius: 50%; border-left: 3px solid rgba(255,217,155,.45); transform: rotate(12deg); }
+    .b1 { top: 8%; right: 8%; --r: 24deg; }
+    .b2 { bottom: 9%; left: 4%; --r: -22deg; width: 58px; height: 38px; }
+    .b3 { top: 40%; left: -2%; --r: 62deg; width: 52px; height: 34px; opacity: .55; }
+
+    main { position: relative; z-index: 2; }
+    section { padding: clamp(4rem, 9vw, 8rem) 1.25rem; }
+    .wrap { width: min(1180px, 100%); margin: 0 auto; }
+    .section-title {
+      display: grid;
+      grid-template-columns: minmax(0, .8fr) minmax(0, 1fr);
+      gap: 2rem;
+      align-items: end;
+      margin-bottom: 2rem;
+    }
+    h2 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.2rem, 5vw, 5rem);
+      line-height: .95;
+      letter-spacing: -.055em;
+      margin: 0;
+      text-wrap: balance;
+    }
+    .section-title p, .lead { color: var(--soft); line-height: 1.65; font-size: 1.05rem; margin: 0; }
+
+    .timeline {
+      display: grid;
+      gap: 1rem;
+      position: relative;
+    }
+    .era {
+      display: grid;
+      grid-template-columns: 9rem minmax(0, 1fr) 12rem;
+      gap: 1.25rem;
+      align-items: stretch;
+      padding: 1rem;
+      border: 1px solid var(--line);
+      background: linear-gradient(135deg, rgba(255,244,223,.08), rgba(255,244,223,.025));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      overflow: hidden;
+    }
+    .date {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.5rem, 3vw, 2.4rem);
+      line-height: .95;
+      color: var(--cream);
+      padding: 1rem;
+    }
+    .era h3 { margin: 0 0 .6rem; font-size: clamp(1.25rem, 2.6vw, 2rem); letter-spacing: -.03em; }
+    .era p { margin: 0; color: var(--soft); line-height: 1.62; }
+    .era-art {
+      min-height: 145px;
+      border-radius: 22px;
+      background: radial-gradient(circle at 30% 30%, var(--cream), transparent 22%), linear-gradient(145deg, rgba(181,107,54,.35), rgba(140,166,91,.18));
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,244,223,.12);
+    }
+    .era-art svg { width: 100%; height: 100%; position: absolute; inset: 0; }
+
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+    .impact {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      min-height: 260px;
+      background: rgba(255,244,223,.07);
+      position: relative;
+      overflow: hidden;
+    }
+    .impact::before {
+      content: attr(data-number);
+      position: absolute;
+      right: .75rem;
+      bottom: -.35rem;
+      font-family: Georgia, serif;
+      font-size: 7rem;
+      line-height: 1;
+      color: rgba(255,244,223,.06);
+    }
+    .impact strong { display: block; font-size: 1.25rem; margin-bottom: .7rem; }
+    .impact p { color: var(--soft); line-height: 1.6; margin: 0; }
+
+    .map-panel {
+      display: grid;
+      grid-template-columns: 1fr .9fr;
+      gap: 1rem;
+      align-items: stretch;
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 10px);
+      padding: 1rem;
+      background: rgba(255,244,223,.06);
+      box-shadow: var(--shadow);
+    }
+    .map {
+      min-height: 430px;
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 52% 50%, rgba(255,217,155,.13), transparent 28rem),
+        linear-gradient(135deg, rgba(143,200,217,.12), rgba(140,166,91,.10));
+      border: 1px solid rgba(255,244,223,.13);
+      position: relative;
+      overflow: hidden;
+    }
+    .map svg { width: 100%; height: 100%; position:absolute; inset:0; }
+    .legend { padding: 1.25rem; }
+    .legend ol { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: .8rem; }
+    .legend li { display: grid; grid-template-columns: 2rem 1fr; gap: .75rem; align-items: start; color: var(--soft); line-height: 1.45; }
+    .badge { width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: 50%; background: var(--cream); color: #2a1308; font-weight: 900; }
+
+    .rituals {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    .ritual {
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.15rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,244,223,.04), rgba(0,0,0,.18)), var(--card);
+      overflow: hidden;
+      position: relative;
+    }
+    .ritual .icon { position: absolute; top: 1rem; right: 1rem; font-size: 5rem; opacity: .22; filter: grayscale(.2); }
+    .ritual h3 { font-size: 1.55rem; margin: 0 0 .5rem; }
+    .ritual p { margin: 0; color: var(--soft); line-height: 1.55; }
+
+    .closing {
+      text-align: center;
+      padding-bottom: 8rem;
+    }
+    .closing .wrap {
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 16px);
+      padding: clamp(2rem, 6vw, 5rem);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,217,155,.18), transparent 24rem),
+        rgba(255,244,223,.06);
+      box-shadow: var(--shadow);
+    }
+    .closing p { max-width: 68ch; margin: 1rem auto 0; color: var(--soft); line-height: 1.7; }
+
+    @keyframes float { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-18px) rotate(2deg); } }
+    @keyframes swirl { to { transform: rotate(360deg); } }
+    @keyframes steam { 0%,100% { transform: translateY(25px) scaleY(.75); opacity: .15; } 45% { transform: translateY(-15px) scaleY(1.1); opacity: .7; } }
+
+    @media (max-width: 880px) {
+      nav { width: calc(100vw - 1rem); justify-content: flex-start; }
+      .hero, .section-title, .map-panel { grid-template-columns: 1fr; }
+      .cup-stage { min-height: 430px; }
+      .era { grid-template-columns: 1fr; }
+      .date { padding: .25rem .25rem 0; }
+      .era-art { min-height: 190px; }
+      .impact-grid, .rituals { grid-template-columns: 1fr; }
+      .map { min-height: 330px; }
+    }
+
+    @media (min-width: 881px) and (max-width: 1080px) {
+      .impact-grid { grid-template-columns: repeat(2, 1fr); }
+      .rituals { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <nav aria-label="Page sections">
+    <a href="#origins">Origins</a>
+    <a href="#timeline">Timeline</a>
+    <a href="#route">Trade Route</a>
+    <a href="#impact">Impact</a>
+    <a href="#rituals">Rituals</a>
+  </nav>
+
+  <header>
+    <div class="hero">
+      <div>
+        <span class="eyebrow">A 1,200-year caffeine migration</span>
+        <h1>From forest fruit to global ritual.</h1>
+        <p>Coffee began as a red berry in the highlands of East Africa. It became a Sufi aid for night prayer, a merchant commodity, a coffeehouse engine of public debate, a plantation crop, and eventually a daily technology for attention.</p>
+        <div class="hero-actions">
+          <a class="button" href="#timeline">Start the timeline ↓</a>
+          <a class="button secondary" href="#impact">Why it mattered</a>
+        </div>
+      </div>
+      <div class="cup-stage" aria-hidden="true">
+        <span class="steam s1"></span><span class="steam s2"></span><span class="steam s3"></span>
+        <div class="cup"></div>
+        <div class="bean b1"></div><div class="bean b2"></div><div class="bean b3"></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="origins">
+      <div class="wrap section-title">
+        <h2>Coffee is not just a drink. It is a portable social machine.</h2>
+        <p>The bean carries a strange bundle: stimulant chemistry, colonial economics, religious practice, workplace rhythm, café culture, and global agriculture. The same cup can mean prayer, conversation, rebellion, productivity, hospitality, or status.</p>
+      </div>
+    </section>
+
+    <section id="timeline">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>The major eras</h2>
+          <p>A compressed timeline of how coffee moved from local plant to world system.</p>
+        </div>
+        <div class="timeline">
+          <article class="era">
+            <div class="date">800s–1400s</div>
+            <div><h3>Highland origins and early use</h3><p>Coffea arabica grows wild in Ethiopia’s highlands. By the fifteenth century, coffee is cultivated and brewed in Yemen, where Sufi communities use it to stay alert during devotional practices.</p></div>
+            <div class="era-art"><svg viewBox="0 0 300 180" role="img" aria-label="Coffee plant"><path d="M0 150 C70 90 120 110 170 55 C220 0 280 20 300 10 L300 180 L0 180Z" fill="#5f7f45" opacity=".72"/><circle cx="114" cy="88" r="14" fill="#d44d35"/><circle cx="146" cy="74" r="11" fill="#d44d35"/><circle cx="166" cy="96" r="13" fill="#b73328"/><path d="M100 130 C130 90 160 70 210 42" stroke="#ffd99b" stroke-width="5" fill="none" opacity=".55"/></svg></div>
+          </article>
+          <article class="era">
+            <div class="date">1500s</div>
+            <div><h3>Ottoman coffeehouses</h3><p>Coffee travels through the Red Sea and Ottoman world. Coffeehouses become urban gathering places for games, news, poetry, politics, and argument — sometimes worrying authorities because conversation is hard to police.</p></div>
+            <div class="era-art"><svg viewBox="0 0 300 180" aria-hidden="true"><rect x="45" y="58" width="210" height="95" rx="18" fill="#8f4d26" opacity=".8"/><path d="M80 59 C105 20 192 20 220 59" fill="none" stroke="#ffd99b" stroke-width="8"/><circle cx="105" cy="105" r="24" fill="#2a1308"/><circle cx="190" cy="105" r="24" fill="#2a1308"/><path d="M75 145 H230" stroke="#ffd99b" stroke-width="5" opacity=".45"/></svg></div>
+          </article>
+          <article class="era">
+            <div class="date">1600s</div>
+            <div><h3>Europe’s “penny universities”</h3><p>Venice, London, Paris, and Vienna develop café cultures. In London, a penny buys coffee and access to talk, pamphlets, business information, and intellectual life. Cafés help incubate newspapers, insurance markets, and political clubs.</p></div>
+            <div class="era-art"><svg viewBox="0 0 300 180" aria-hidden="true"><rect x="42" y="45" width="70" height="100" fill="#302018"/><rect x="122" y="28" width="55" height="117" fill="#70411f"/><rect x="186" y="64" width="72" height="81" fill="#4e2c18"/><g fill="#ffd99b" opacity=".65"><rect x="58" y="62" width="15" height="20"/><rect x="82" y="62" width="15" height="20"/><rect x="136" y="48" width="15" height="20"/><rect x="207" y="82" width="15" height="20"/></g><path d="M25 145 H275" stroke="#ffd99b" stroke-width="5" opacity=".4"/></svg></div>
+          </article>
+          <article class="era">
+            <div class="date">1700s–1800s</div>
+            <div><h3>Plantation expansion and empire</h3><p>European demand drives coffee cultivation into colonies across the Caribbean, Latin America, and Asia. The history becomes darker: forced labor, slavery, land concentration, and export economies sit behind the elegant café cup.</p></div>
+            <div class="era-art"><svg viewBox="0 0 300 180" aria-hidden="true"><path d="M0 120 C45 92 80 136 130 105 C190 68 230 102 300 70 V180 H0Z" fill="#8ca65b" opacity=".62"/><path d="M0 148 C70 118 135 158 210 118 C250 98 280 104 300 96 V180 H0Z" fill="#61401f"/><g fill="#d44d35"><circle cx="80" cy="112" r="7"/><circle cx="112" cy="124" r="6"/><circle cx="190" cy="104" r="7"/><circle cx="235" cy="112" r="6"/></g></svg></div>
+          </article>
+          <article class="era">
+            <div class="date">1900s</div>
+            <div><h3>Instant, diner, espresso, office</h3><p>Coffee industrializes: vacuum packs, instant coffee, percolators, diners, espresso bars, and office coffee make it a mass habit. It becomes tied to labor: the break room, the commute, the night shift, the deadline.</p></div>
+            <div class="era-art"><svg viewBox="0 0 300 180" aria-hidden="true"><rect x="70" y="55" width="145" height="86" rx="14" fill="#b56b36"/><rect x="95" y="35" width="95" height="35" rx="10" fill="#ffd99b" opacity=".75"/><path d="M215 82 C260 75 260 128 215 121" fill="none" stroke="#ffd99b" stroke-width="12"/><path d="M100 92 H190" stroke="#2a1308" stroke-width="10" stroke-linecap="round"/><path d="M115 115 H175" stroke="#2a1308" stroke-width="10" stroke-linecap="round"/></svg></div>
+          </article>
+          <article class="era">
+            <div class="date">2000s–now</div>
+            <div><h3>Specialty, origin, and climate pressure</h3><p>Third-wave coffee treats beans like wine: origin, roast profile, processing, and farmer relationships matter. At the same time, climate change threatens arabica-growing regions, pushing coffee into questions of resilience and fairness.</p></div>
+            <div class="era-art"><svg viewBox="0 0 300 180" aria-hidden="true"><circle cx="92" cy="94" r="44" fill="#2a1308"/><circle cx="92" cy="94" r="31" fill="none" stroke="#ffd99b" stroke-width="8" opacity=".65"/><path d="M160 135 C168 78 206 48 255 38" fill="none" stroke="#8ca65b" stroke-width="12" stroke-linecap="round"/><path d="M188 82 C185 50 220 42 235 60 C218 86 202 93 188 82Z" fill="#8ca65b"/><path d="M207 110 C204 80 240 73 255 92 C237 116 222 122 207 110Z" fill="#8ca65b"/></svg></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="route">
+      <div class="wrap">
+        <div class="section-title"><h2>The route out of the mountains</h2><p>Coffee’s world tour followed ports, empires, religious networks, smugglers, colonial botany, and consumer demand.</p></div>
+        <div class="map-panel">
+          <div class="map" aria-label="Stylized coffee trade map">
+            <svg viewBox="0 0 700 430" role="img" aria-label="Coffee route from Ethiopia to Yemen, Ottoman cities, Europe, and the Americas">
+              <path d="M96 230 C160 170 210 205 250 150 C300 80 400 86 455 118 C520 155 548 210 640 185" fill="none" stroke="#ffd99b" stroke-width="5" stroke-dasharray="10 12" opacity=".75"/>
+              <path d="M170 238 C260 310 350 305 455 275 C530 255 570 305 640 335" fill="none" stroke="#8fc8d9" stroke-width="5" stroke-dasharray="2 12" opacity=".72"/>
+              <g fill="rgba(255,244,223,.12)" stroke="rgba(255,244,223,.28)"><path d="M95 160 C130 120 192 125 220 170 C235 200 215 235 180 238 C138 242 82 216 95 160Z"/><path d="M255 95 C340 42 455 67 500 134 C544 197 510 252 420 250 C315 246 210 178 255 95Z"/><path d="M70 300 C155 265 230 290 300 330 C220 385 120 380 70 300Z"/><path d="M505 260 C575 240 655 260 680 328 C622 386 535 360 505 260Z"/></g>
+              <g font-family="ui-sans-serif" font-weight="900" font-size="16"><circle cx="112" cy="225" r="18" fill="#ffd99b"/><text x="107" y="231" fill="#2a1308">1</text><circle cx="238" cy="160" r="18" fill="#ffd99b"/><text x="233" y="166" fill="#2a1308">2</text><circle cx="405" cy="105" r="18" fill="#ffd99b"/><text x="400" y="111" fill="#2a1308">3</text><circle cx="548" cy="193" r="18" fill="#ffd99b"/><text x="543" y="199" fill="#2a1308">4</text><circle cx="635" cy="334" r="18" fill="#ffd99b"/><text x="630" y="340" fill="#2a1308">5</text></g>
+            </svg>
+          </div>
+          <div class="legend">
+            <h3>How it spread</h3>
+            <ol>
+              <li><span class="badge">1</span><span><strong>Ethiopia:</strong> wild arabica and regional consumption traditions.</span></li>
+              <li><span class="badge">2</span><span><strong>Yemen:</strong> cultivation, roasting, brewing, and the port of Mocha.</span></li>
+              <li><span class="badge">3</span><span><strong>Ottoman world:</strong> coffeehouses and urban public culture.</span></li>
+              <li><span class="badge">4</span><span><strong>Europe:</strong> cafés, commerce, newspapers, and political debate.</span></li>
+              <li><span class="badge">5</span><span><strong>Colonial tropics:</strong> plantation production remakes landscapes and labor systems.</span></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="impact">
+      <div class="wrap">
+        <div class="section-title"><h2>What coffee changed</h2><p>Its importance is not just taste. Coffee helped organize attention, spaces, economies, and social life.</p></div>
+        <div class="impact-grid">
+          <article class="impact" data-number="01"><strong>Public conversation</strong><p>Coffeehouses created semi-public rooms where merchants, writers, radicals, scientists, and gossips could meet outside church, court, or home.</p></article>
+          <article class="impact" data-number="02"><strong>Capitalism and information</strong><p>Some cafés became infrastructure for markets: shipping news, auctions, insurance, journalism, and commercial networks.</p></article>
+          <article class="impact" data-number="03"><strong>Labor rhythms</strong><p>The coffee break is a tiny social contract: a sanctioned pause that also supports alertness, long hours, and modern work tempo.</p></article>
+          <article class="impact" data-number="04"><strong>Unequal supply chains</strong><p>Coffee’s pleasures have often depended on extraction: colonial land, coerced labor, volatile commodity prices, and climate risk borne by growers.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="rituals">
+      <div class="wrap">
+        <div class="section-title"><h2>One bean, many rituals</h2><p>Coffee adapts to local forms: concentrated, sweet, filtered, boiled, iced, ceremonial, utilitarian.</p></div>
+        <div class="rituals">
+          <article class="ritual" style="--card: linear-gradient(135deg, #46210f, #20100a);"><div class="icon">☕</div><h3>Conversation</h3><p>From Ottoman coffeehouses to European cafés, coffee gives strangers and friends a reason to sit, linger, and exchange news.</p></article>
+          <article class="ritual" style="--card: linear-gradient(135deg, #2c2318, #0f0a07);"><div class="icon">⌁</div><h3>Focus</h3><p>Caffeine blocks adenosine receptors, which can reduce sleepiness. Culturally, that chemistry became a daily tool for study, prayer, work, and making things.</p></article>
+          <article class="ritual" style="--card: linear-gradient(135deg, #3b2d16, #140b07);"><div class="icon">◆</div><h3>Identity</h3><p>Your order can signal taste, class, place, routine, and values — from diner refill to espresso bar to single-origin pour-over.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing">
+      <div class="wrap">
+        <span class="eyebrow">The short version</span>
+        <h2>Coffee is a berry that became a civilization habit.</h2>
+        <p>It moved through religious practice, trade, empire, cafés, factories, offices, and specialty culture. Every cup compresses botany, chemistry, labor, design, and social ritual into something small enough to hold in one hand.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
