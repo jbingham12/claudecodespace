@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A spoiler-free, interactive mini-site for The White Lotus Season 1: vibe guide, character cards, episode itinerary, and resort moodboard." />
+  <title>The White Lotus: Season One — Spoiler-Free Resort Guide</title>
+  <style>
+    :root {
+      --ink:#18231f; --deep:#0d2d2a; --palm:#1c6c5f; --palm2:#2f8e78; --sand:#f4dec0;
+      --cream:#fff5df; --shell:#ffe9be; --coral:#f07b62; --hibiscus:#d93a62; --sun:#f7b857;
+      --pool:#57c4c3; --night:#071918; --glass: rgba(255,255,255,.14); --shadow: 0 24px 80px rgba(6,24,21,.25);
+      --radius: 28px; --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      margin:0; font-family:var(--font); color:var(--ink); background:
+        radial-gradient(circle at 12% -12%, rgba(247,184,87,.75), transparent 34rem),
+        radial-gradient(circle at 86% 0%, rgba(87,196,195,.55), transparent 30rem),
+        linear-gradient(180deg, #fff4df 0%, #f5dfbe 44%, #0b2a28 44%, #071918 100%);
+      min-height:100vh; overflow-x:hidden;
+    }
+    a { color: inherit; }
+    .grain { pointer-events:none; position:fixed; inset:0; z-index:1; opacity:.18; mix-blend-mode:multiply; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E"); }
+    .leaf { position:fixed; z-index:0; opacity:.13; filter: blur(.2px); animation: drift 22s ease-in-out infinite; }
+    .leaf.one { top:7%; left:-3%; font-size:19rem; transform:rotate(18deg); }
+    .leaf.two { top:56%; right:-4%; font-size:24rem; animation-delay:-6s; transform:rotate(-20deg); }
+    @keyframes drift { 0%,100%{ translate:0 0; rotate:0deg } 50%{ translate: 14px 26px; rotate:3deg } }
+    .wrap { position:relative; z-index:2; width:min(1180px, calc(100% - 36px)); margin:auto; }
+    nav { position:sticky; top:14px; z-index:5; margin:14px auto 0; width:min(920px, calc(100% - 24px)); backdrop-filter: blur(18px); background:rgba(255,245,223,.72); border:1px solid rgba(24,35,31,.12); border-radius:999px; box-shadow:0 10px 34px rgba(24,35,31,.12); display:flex; gap:8px; align-items:center; justify-content:center; padding:8px; }
+    nav a, nav button { border:0; border-radius:999px; padding:10px 14px; background:transparent; color:var(--deep); font-weight:760; text-decoration:none; cursor:pointer; white-space:nowrap; }
+    nav a:hover, nav button:hover, nav a:focus-visible, nav button:focus-visible { background:rgba(28,108,95,.13); outline:0; }
+    .hero { min-height:92vh; display:grid; grid-template-columns: 1.05fr .95fr; gap:42px; align-items:center; padding:60px 0 34px; }
+    .eyebrow { letter-spacing:.22em; text-transform:uppercase; font-weight:900; color:var(--palm); font-size:.78rem; }
+    h1 { font-family:var(--serif); font-size:clamp(3.7rem, 9vw, 9.6rem); line-height:.83; margin:18px 0; color:var(--deep); text-wrap:balance; }
+    .subtitle { font-size:clamp(1.08rem, 2vw, 1.45rem); line-height:1.55; max-width:63ch; color:#36433d; }
+    .badge-row { display:flex; flex-wrap:wrap; gap:10px; margin:28px 0; }
+    .badge { border:1px solid rgba(13,45,42,.16); background:rgba(255,255,255,.45); border-radius:999px; padding:10px 13px; font-weight:820; box-shadow:0 8px 24px rgba(13,45,42,.08); }
+    .cta-row { display:flex; flex-wrap:wrap; gap:14px; align-items:center; }
+    .btn { border:0; border-radius:18px; background:var(--deep); color:#fff8e6; padding:15px 20px; font-weight:900; box-shadow:0 14px 30px rgba(13,45,42,.22); cursor:pointer; text-decoration:none; display:inline-flex; gap:8px; align-items:center; }
+    .btn.alt { background:rgba(255,255,255,.6); color:var(--deep); border:1px solid rgba(13,45,42,.15); box-shadow:none; }
+    .btn:hover { transform:translateY(-2px); }
+    .resort-card { position:relative; min-height:570px; border-radius:38px; overflow:hidden; background:linear-gradient(160deg, rgba(255,255,255,.5), rgba(255,255,255,.1)); box-shadow:var(--shadow); border:1px solid rgba(255,255,255,.34); }
+    .poster { position:absolute; inset:18px; border-radius:30px; overflow:hidden; background:
+      linear-gradient(180deg, rgba(255,218,143,.7), rgba(87,196,195,.24) 41%, rgba(8,45,42,.92) 74%),
+      radial-gradient(circle at 35% 18%, #fff4cd 0 9%, transparent 10%),
+      linear-gradient(110deg, #ffcf85, #58b8ad 48%, #0d2d2a); }
+    .sun { position:absolute; width:140px; height:140px; border-radius:50%; background:radial-gradient(circle, #fff9cd, #f7b857 58%, rgba(247,184,87,0) 61%); left:13%; top:10%; box-shadow:0 0 70px #ffd37a; }
+    .hotel { position:absolute; left:9%; right:9%; bottom:18%; height:210px; border-radius:18px 18px 0 0; background:linear-gradient(90deg, #faf0d7, #eec78e); box-shadow: inset 0 -22px 0 rgba(76,47,24,.14); display:grid; grid-template-columns:repeat(7,1fr); gap:8px; padding:26px 20px; }
+    .window { border-radius:8px; background:rgba(13,45,42,.78); box-shadow:inset 0 8px 0 rgba(255,255,255,.16); }
+    .pool { position:absolute; left:18%; right:18%; bottom:7%; height:74px; border-radius:50%; background:radial-gradient(ellipse at center, #8df7ef, #3db3b2 65%, #1a6c68 66%); border:10px solid rgba(255,245,223,.55); animation: shimmer 3s ease-in-out infinite; }
+    @keyframes shimmer { 50% { filter:saturate(1.4) brightness(1.08); transform:scaleX(1.02); } }
+    .float { position:absolute; right:30px; top:30px; background:rgba(255,245,223,.9); border-radius:22px; padding:18px; width:min(260px, 45%); box-shadow:0 20px 55px rgba(6,24,21,.2); }
+    .float strong { display:block; font-family:var(--serif); font-size:1.5rem; }
+    .ticker { position:absolute; left:0; right:0; bottom:0; background:rgba(6,24,21,.88); color:#fff5df; display:flex; gap:28px; overflow:hidden; white-space:nowrap; padding:12px 0; }
+    .ticker span { animation: marquee 18s linear infinite; font-weight:900; letter-spacing:.08em; text-transform:uppercase; font-size:.8rem; }
+    @keyframes marquee { from{ transform:translateX(0) } to{ transform:translateX(-100%) } }
+    section { padding:70px 0; }
+    .section-head { display:flex; justify-content:space-between; gap:28px; align-items:end; margin-bottom:26px; }
+    h2 { font-family:var(--serif); font-size:clamp(2.4rem,5vw,5rem); line-height:.95; margin:0; color:var(--cream); }
+    .light h2, h2.dark { color:var(--deep); }
+    .note { max-width:56ch; line-height:1.55; color:rgba(255,245,223,.8); }
+    .light .note { color:#4b554f; }
+    .grid { display:grid; gap:18px; }
+    .cards { grid-template-columns:repeat(4, 1fr); }
+    .card { background:rgba(255,245,223,.92); border:1px solid rgba(255,255,255,.24); border-radius:var(--radius); padding:22px; box-shadow:0 18px 48px rgba(5,22,20,.18); transition:.25s ease; position:relative; overflow:hidden; }
+    .card:hover { transform:translateY(-5px); }
+    .card::after { content:""; position:absolute; inset:auto -50px -70px auto; width:140px; height:140px; border-radius:50%; background:rgba(240,123,98,.13); }
+    .card .icon { font-size:2.1rem; }
+    .card h3 { margin:12px 0 8px; font-size:1.2rem; color:var(--deep); }
+    .card p { margin:0; line-height:1.5; color:#52615a; }
+    .passport { display:grid; grid-template-columns: 310px 1fr; gap:22px; align-items:stretch; }
+    .stamp-panel { border-radius:var(--radius); background:#fff5df; padding:24px; min-height:350px; box-shadow:var(--shadow); }
+    .stamp { aspect-ratio:1; border:3px dashed var(--coral); border-radius:50%; display:grid; place-items:center; text-align:center; color:var(--hibiscus); font-family:var(--serif); font-size:2rem; transform:rotate(-10deg); margin:auto; background:rgba(247,184,87,.11); }
+    .tabs { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
+    .tab { border:1px solid rgba(13,45,42,.14); background:rgba(13,45,42,.08); color:var(--deep); border-radius:999px; padding:10px 12px; font-weight:850; cursor:pointer; }
+    .tab.active { background:var(--shell); color:var(--deep); }
+    .tab-body { min-height:350px; border-radius:var(--radius); background:rgba(13,45,42,.88); border:1px solid rgba(255,245,223,.18); padding:28px; color:var(--cream); box-shadow:0 20px 60px rgba(0,0,0,.16); }
+    .tab-body h3 { font-family:var(--serif); font-size:2.5rem; margin:0 0 12px; }
+    .tab-body p, .tab-body li { line-height:1.65; color:rgba(255,245,223,.82); }
+    .manifest { display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:10px; margin-top:20px; }
+    .room-key { aspect-ratio:.72; border:0; border-radius:18px; background:linear-gradient(160deg, #fff5df, #ffd791); color:var(--deep); cursor:pointer; box-shadow:0 12px 30px rgba(0,0,0,.12); padding:12px; display:flex; flex-direction:column; justify-content:space-between; text-align:left; transition:.2s; }
+    .room-key:hover, .room-key.active { transform:translateY(-5px) rotate(-1deg); background:linear-gradient(160deg, #fffae9, #f07b62); color:#fff; }
+    .room-key b { font-family:var(--serif); font-size:1.35rem; }
+    .character-display { margin-top:18px; display:grid; grid-template-columns:1.2fr .8fr; gap:18px; }
+    .quote-card { border-radius:var(--radius); background:rgba(255,245,223,.92); color:var(--deep); padding:28px; box-shadow:var(--shadow); min-height:230px; }
+    .quote-card h3 { margin:0; font-family:var(--serif); font-size:2.5rem; }
+    .quote-card p { line-height:1.6; color:#44524d; }
+    .meter { border-radius:var(--radius); background:rgba(255,245,223,.1); border:1px solid rgba(255,245,223,.18); padding:20px; }
+    .bar { margin:14px 0; }
+    .bar span { display:flex; justify-content:space-between; color:var(--cream); font-weight:800; font-size:.9rem; }
+    .track { height:11px; border-radius:999px; background:rgba(255,245,223,.16); overflow:hidden; margin-top:7px; }
+    .fill { display:block; height:100%; border-radius:999px; background:linear-gradient(90deg, var(--sun), var(--coral), var(--pool)); width:50%; transition:width .5s ease; }
+    .itinerary { display:grid; grid-template-columns: repeat(6, 1fr); gap:12px; }
+    .day { border:0; text-align:left; min-height:190px; border-radius:24px; padding:18px; background:rgba(255,245,223,.93); cursor:pointer; box-shadow:0 18px 46px rgba(8,29,26,.16); color:var(--deep); position:relative; overflow:hidden; }
+    .day small { font-weight:950; color:var(--coral); letter-spacing:.12em; text-transform:uppercase; }
+    .day h3 { font-family:var(--serif); font-size:1.55rem; margin:12px 0; }
+    .day p { color:#50615b; line-height:1.45; }
+    .day.active { outline:4px solid rgba(240,123,98,.55); transform:translateY(-4px); }
+    .day-detail { margin-top:18px; border-radius:var(--radius); background:rgba(13,45,42,.9); color:var(--cream); padding:28px; box-shadow:var(--shadow); display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    .day-detail h3 { font-family:var(--serif); font-size:2.2rem; margin:0 0 8px; }
+    .day-detail li { margin:8px 0; line-height:1.5; color:rgba(255,245,223,.82); }
+    .soundboard { display:grid; grid-template-columns:repeat(5, 1fr); gap:14px; }
+    .sound { min-height:150px; border:1px solid rgba(13,45,42,.14); border-radius:26px; background:#fff5df; color:var(--deep); cursor:pointer; padding:18px; text-align:left; box-shadow:0 18px 46px rgba(8,29,26,.12); }
+    .sound .emoji { font-size:2.2rem; display:block; margin-bottom:14px; }
+    .sound.playing { background:linear-gradient(160deg, #0d2d2a, #1c6c5f); color:#fff5df; }
+    .game { display:grid; grid-template-columns: .9fr 1.1fr; gap:22px; align-items:stretch; }
+    .quiz, .result { border-radius:var(--radius); background:rgba(255,245,223,.92); padding:26px; box-shadow:var(--shadow); }
+    .quiz h3, .result h3 { font-family:var(--serif); margin:0 0 12px; font-size:2rem; color:var(--deep); }
+    .choice { display:block; width:100%; margin:10px 0; text-align:left; border:1px solid rgba(13,45,42,.15); border-radius:16px; padding:14px 15px; background:#fffaf0; cursor:pointer; color:var(--deep); font-weight:800; }
+    .choice:hover { background:#ffe6b8; }
+    .mood { min-height:210px; border-radius:24px; padding:22px; color:#fff5df; background:linear-gradient(145deg, var(--deep), var(--palm)); position:relative; overflow:hidden; }
+    .mood::before { content:""; position:absolute; inset:-55% auto auto -16%; width:260px; height:260px; border-radius:50%; background:rgba(247,184,87,.55); filter:blur(4px); }
+    .mood strong { position:relative; display:block; font-family:var(--serif); font-size:2.4rem; }
+    .sources { display:flex; flex-wrap:wrap; gap:12px; }
+    .sources a { color:#fff5df; border:1px solid rgba(255,245,223,.24); border-radius:999px; padding:10px 13px; text-decoration:none; }
+    footer { color:rgba(255,245,223,.78); padding:45px 0 70px; }
+    .toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(120px); z-index:8; background:#fff5df; color:var(--deep); border-radius:999px; padding:12px 18px; box-shadow:var(--shadow); font-weight:900; transition:.28s; }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+    @media (max-width:900px){ nav{overflow:auto; justify-content:flex-start}.hero,.passport,.character-display,.day-detail,.game{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}.itinerary{grid-template-columns:repeat(2,1fr)}.soundboard{grid-template-columns:repeat(2,1fr)}.manifest{grid-template-columns:repeat(3,1fr)}.resort-card{min-height:470px}.float{width:auto;left:30px}.section-head{display:block} }
+    @media (max-width:560px){ .cards,.itinerary,.soundboard{grid-template-columns:1fr}.manifest{grid-template-columns:repeat(2,1fr)} h1{font-size:4.1rem}.hotel{grid-template-columns:repeat(4,1fr)} }
+  </style>
+</head>
+<body>
+  <div class="grain"></div><div class="leaf one">✦</div><div class="leaf two">✺</div>
+  <nav aria-label="Resort navigation">
+    <a href="#vibe">Vibe</a><a href="#passport">Passport</a><a href="#guests">Guests</a><a href="#itinerary">Itinerary</a><a href="#extras">Interactive</a><button id="spoilerBtn" type="button">Spoiler Shield: ON</button>
+  </nav>
+
+  <main>
+    <header class="wrap hero">
+      <div>
+        <div class="eyebrow">Spoiler-free resort orientation</div>
+        <h1>The White Lotus<br>Season One</h1>
+        <p class="subtitle">A creative, interactive guide to the HBO satire set at a fictional luxury resort in Hawaii. No ending reveals. No twist explanations. Just atmosphere, characters, themes, and enough polished marble to make class anxiety squeak.</p>
+        <div class="badge-row" aria-label="Quick facts">
+          <span class="badge">🌺 Hawaii setting</span><span class="badge">🎬 Created by Mike White</span><span class="badge">📺 6 episodes</span><span class="badge">🧳 Social satire</span>
+        </div>
+        <div class="cta-row">
+          <a class="btn" href="#passport">Check in</a><a class="btn alt" href="#extras">Try the vibe quiz</a>
+        </div>
+      </div>
+      <div class="resort-card" aria-label="Stylized resort illustration">
+        <div class="poster"><div class="sun"></div><div class="hotel" aria-hidden="true"><span class="window"></span><span class="window"></span><span class="window"></span><span class="window"></span><span class="window"></span><span class="window"></span><span class="window"></span><span class="window"></span><span class="window"></span><span class="window"></span><span class="window"></span><span class="window"></span><span class="window"></span><span class="window"></span></div><div class="pool"></div><div class="float"><strong>Welcome amenity</strong><p>One week, one resort, many tiny status emergencies.</p></div><div class="ticker"><span>NO SPOILERS • RESORT SATIRE • HAWAII • CHARACTER CHAOS • WATCH BLIND IF YOU CAN •&nbsp;</span><span>NO SPOILERS • RESORT SATIRE • HAWAII • CHARACTER CHAOS • WATCH BLIND IF YOU CAN •&nbsp;</span></div></div>
+      </div>
+    </header>
+
+    <section class="light" id="vibe">
+      <div class="wrap">
+        <div class="section-head"><h2 class="dark">What kind of vacation is this?</h2><p class="note">The show looks like a luxury postcard and behaves like a pressure cooker. The fun is watching tiny frictions—status, money, desire, guilt, entitlement—turn the air conditioning down to “haunted.”</p></div>
+        <div class="grid cards">
+          <article class="card"><div class="icon">🍹</div><h3>Paradise, slightly curdled</h3><p>Bright pools, soft towels, and a feeling that the resort brochure left out several emotional hazards.</p></article>
+          <article class="card"><div class="icon">🛎️</div><h3>Service with a subtext</h3><p>Staff and guests orbit each other in a system where politeness is mandatory and power is never really off-duty.</p></article>
+          <article class="card"><div class="icon">📱</div><h3>Modern anxieties</h3><p>Careers, relationships, identity, family, and self-image all arrive with luggage. Some of it is overweight.</p></article>
+          <article class="card"><div class="icon">🌊</div><h3>Comic dread</h3><p>It is funny, uncomfortable, and very good at making silence feel like a chandelier about to fall.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="passport">
+      <div class="wrap passport">
+        <aside class="stamp-panel"><div class="stamp">WHITE<br>LOTUS<br>S1</div><p><strong>Concierge note:</strong> This guide avoids plot turns. The “itinerary” describes episode flavor only, not outcomes. I checked the luggage myself. No contraband spoilers.</p></aside>
+        <div>
+          <div class="section-head"><h2>Resort passport</h2><p class="note">Tap a tab to skim the season without stepping on a narrative landmine.</p></div>
+          <div class="tabs" role="tablist" aria-label="Passport tabs"><button class="tab active" data-tab="premise">Premise</button><button class="tab" data-tab="watch">Why watch</button><button class="tab" data-tab="themes">Themes</button><button class="tab" data-tab="rules">Spoiler rules</button></div>
+          <article class="tab-body" id="tabBody" aria-live="polite"></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="guests">
+      <div class="wrap">
+        <div class="section-head"><h2>Guest manifest</h2><p class="note">Tap a room key for a spoiler-free read on the character energy. Not an alibi. Definitely not legal advice.</p></div>
+        <div class="manifest" id="keys"></div>
+        <div class="character-display">
+          <article class="quote-card" id="characterCard"></article>
+          <aside class="meter" aria-label="Character vibe meters"><div class="bar"><span><b>Luxury tolerance</b><b id="m1v">50%</b></span><div class="track"><i class="fill" id="m1"></i></div></div><div class="bar"><span><b>Self-awareness</b><b id="m2v">50%</b></span><div class="track"><i class="fill" id="m2"></i></div></div><div class="bar"><span><b>Chaos potential</b><b id="m3v">50%</b></span><div class="track"><i class="fill" id="m3"></i></div></div></aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="itinerary">
+      <div class="wrap">
+        <div class="section-head"><h2>Six-episode itinerary</h2><p class="note">Spoiler-free episode compass: what to watch for structurally and tonally. No reveals, no endings, no “and then the thing happens.” Civilization survives another day.</p></div>
+        <div class="itinerary" id="days"></div>
+        <div class="day-detail" id="dayDetail"></div>
+      </div>
+    </section>
+
+    <section id="extras">
+      <div class="wrap">
+        <div class="section-head"><h2>Interactive resort toys</h2><p class="note">Ambient soundboard, vibe quiz, and a watch-night generator. Add cocktail umbrella. Optional. Strongly implied.</p></div>
+        <div class="soundboard" id="soundboard" aria-label="Ambient resort soundboard"></div>
+        <div class="game" style="margin-top:22px">
+          <div class="quiz"><h3>Which resort mode are you?</h3><div id="quizQ"></div><div id="quizChoices"></div></div>
+          <div class="result"><h3>Your no-spoiler watch kit</h3><div class="mood" id="mood"><strong>Tap answers to generate.</strong><p>Your resort persona will appear here, along with a watch-night pairing.</p></div><button class="choice" id="randomPlan" type="button">Generate random watch-night plan</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-head"><h2>Sources & spoiler policy</h2><p class="note">Facts here are basic public orientation: season setting, creator, episode count, and cast. The writing intentionally avoids major plot outcomes.</p></div>
+        <div class="sources"><a href="https://www.hbomax.com/shows/white-lotus/14f9834d-bc23-41a8-ab61-5c8abdbea505">HBO / Max</a><a href="https://en.wikipedia.org/wiki/The_White_Lotus_season_1">Wikipedia season overview</a><a href="https://www.sky.com/watch/the-white-lotus/cast-and-characters-season-one">Sky / HBO cast guide</a></div>
+      </div>
+    </section>
+  </main>
+  <footer class="wrap">Built as a fan-made, spoiler-free interactive guide. Not affiliated with HBO. Please return all room keys to the front desk; Armond is watching.</footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const tabs = {
+  premise: `<h3>One week at a luxury Hawaiian resort</h3><p>Season one follows guests and employees at the fictional White Lotus resort. It is a satirical comedy-drama: beautiful surface, sharp teeth underneath.</p><ul><li>Six episodes.</li><li>Created, written, and directed by Mike White.</li><li>Best enjoyed with as little plot knowledge as possible.</li></ul>`,
+  watch: `<h3>Why it lands</h3><p>It has the rhythm of a farce, the discomfort of a class seminar, and the scenic discipline of a resort ad that knows too much.</p><ul><li>Great ensemble performances.</li><li>Short enough for a weekend watch.</li><li>Funny in the “oh no, I recognize that impulse” way.</li></ul>`,
+  themes: `<h3>Themes without giveaways</h3><p>Privilege, work, tourism, family systems, marriage, grief, money, and the invisible labor required to keep paradise looking effortless.</p><p>It is less “vacation fantasy” than “vacation MRI.”</p>`,
+  rules: `<h3>Shield protocol</h3><ul><li>No ending reveals.</li><li>No mystery explanations.</li><li>No character outcome spoilers.</li><li>No episode-by-episode plot recap beyond tone and setup.</li></ul><p>If a spoiler tries to check in, we tell it the room is not ready.</p>`
+};
+function setTab(name){ document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===name)); $('#tabBody').innerHTML=tabs[name]; }
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab))); setTab('premise');
+
+const characters = [
+ {room:'101', name:'Armond', actor:'Murray Bartlett', icon:'🛎️', text:'The resort manager: polished, theatrical, and operating at a pressure level unsuitable for linen uniforms.', a:88,b:38,c:91},
+ {room:'108', name:'Belinda', actor:'Natasha Rothwell', icon:'🌿', text:'Spa manager, emotional first responder, and probably the only person here who understands the word “boundaries.”', a:54,b:84,c:34},
+ {room:'214', name:'Tanya', actor:'Jennifer Coolidge', icon:'👜', text:'A wealthy guest with operatic feelings, expensive sunglasses, and a gravitational field of need.', a:95,b:42,c:82},
+ {room:'302', name:'Nicole', actor:'Connie Britton', icon:'💼', text:'Executive energy on vacation: the laptop may be closed, but the performance review never ends.', a:86,b:58,c:55},
+ {room:'303', name:'Mark', actor:'Steve Zahn', icon:'🩺', text:'A dad in existential turbulence, seeking reassurance from anyone with a pulse and a pool chair.', a:62,b:49,c:66},
+ {room:'304', name:'Olivia', actor:'Sydney Sweeney', icon:'📚', text:'Sharper than the resort cutlery; observes everything and forgives almost nothing.', a:72,b:61,c:76},
+ {room:'305', name:'Paula', actor:'Brittany O’Grady', icon:'🎧', text:'A guest who sees the resort’s moral architecture more clearly than most people paying to ignore it.', a:48,b:78,c:69},
+ {room:'412', name:'Rachel', actor:'Alexandra Daddario', icon:'📝', text:'A newlywed writer trying to hear her own thoughts over the roar of other people’s expectations.', a:70,b:67,c:52},
+ {room:'414', name:'Shane', actor:'Jake Lacy', icon:'🔑', text:'Honeymooner, grievance collector, and living proof that a room assignment can become a worldview.', a:98,b:19,c:86},
+ {room:'509', name:'Quinn', actor:'Fred Hechinger', icon:'🎮', text:'Teenager marooned between screens, family noise, and the unnerving possibility of actual nature.', a:32,b:63,c:45}
+];
+const keys = $('#keys');
+function characterHTML(c){ return `<h3>${c.icon} ${c.name}</h3><p><strong>Played by ${c.actor}.</strong></p><p>${c.text}</p><p><em>Spoiler-free concierge read:</em> watch what this person wants, what they perform, and what the resort quietly reveals about the gap between the two.</p>`; }
+function setCharacter(i){ const c=characters[i]; document.querySelectorAll('.room-key').forEach((b,n)=>b.classList.toggle('active',n===i)); $('#characterCard').innerHTML=characterHTML(c); [['m1',c.a],['m2',c.b],['m3',c.c]].forEach(([id,v],idx)=>{ $('#'+id).style.width=v+'%'; $('#'+id+'v').textContent=v+'%'; }); }
+characters.forEach((c,i)=>{ const b=document.createElement('button'); b.className='room-key'; b.innerHTML=`<b>${c.room}</b><span>${c.icon}</span><strong>${c.name}</strong>`; b.addEventListener('click',()=>setCharacter(i)); keys.appendChild(b); }); setCharacter(0);
+
+const episodes = [
+ {n:1, title:'Arrivals', vibe:'Check-in smiles. Hidden weather.', detail:'Notice how fast the resort teaches you who gets catered to, who gets managed, and who has to keep smiling.', watch:['Introductions as social X-rays','A luxury space built on invisible labor','Tiny mistakes treated like cosmic insults']},
+ {n:2, title:'New Day', vibe:'The vacation mask starts sweating.', detail:'The show begins stacking small discomforts instead of shouting. Excellent, rude craftsmanship.', watch:['Status games at breakfast','Family roles hardening in sunlight','The comedy of “being reasonable”']},
+ {n:3, title:'Mysterious Monkeys', vibe:'Everyone wants something.', detail:'Desire becomes the resort’s unofficial activity schedule: validation, escape, attention, control.', watch:['Who gets listened to','Who translates feelings into demands','How paradise amplifies boredom']},
+ {n:4, title:'Recentering', vibe:'Wellness, but make it unstable.', detail:'People try to reset themselves while carrying the exact habits that made them need resetting.', watch:['Therapy language in the wild','Power wearing a soft robe','The gap between insight and behavior']},
+ {n:5, title:'The Lotus-Eaters', vibe:'The vacation has teeth now.', detail:'The tone sharpens, but this guide remains professionally muzzled. You are welcome.', watch:['Choices made under resort lighting','The cost of pretending nothing is wrong','Comedy turning slightly volcanic']},
+ {n:6, title:'Departures', vibe:'Checkout is not a cleanse.', detail:'Go in blind. Let the season land on its own terms. Then come back and argue with a plant.', watch:['How each arc echoes the themes','What changes versus what merely gets repackaged','The final taste the show leaves behind']}
+];
+const days=$('#days');
+function setDay(i){ const e=episodes[i]; document.querySelectorAll('.day').forEach((b,n)=>b.classList.toggle('active',n===i)); $('#dayDetail').innerHTML=`<div><h3>Episode ${e.n}: ${e.title}</h3><p>${e.detail}</p></div><ul>${e.watch.map(x=>`<li>${x}</li>`).join('')}</ul>`; }
+episodes.forEach((e,i)=>{ const b=document.createElement('button'); b.className='day'; b.innerHTML=`<small>Episode ${e.n}</small><h3>${e.title}</h3><p>${e.vibe}</p>`; b.addEventListener('click',()=>setDay(i)); days.appendChild(b); }); setDay(0);
+
+let audioCtx, activeOsc;
+const sounds = [ ['🌊','Pool shimmer',220, 'soft aqua pulse'], ['🛎️','Lobby bell',880, 'one polite warning'], ['🌴','Palm wind',140, 'low tropical hush'], ['🍹','Ice in glass',520, 'tiny luxury percussion'], ['🦜','Distant bird',760, 'jungle postcard'] ];
+function beep(freq){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); if(activeOsc){ activeOsc.stop(); activeOsc=null; document.querySelectorAll('.sound').forEach(s=>s.classList.remove('playing')); return; } const osc=audioCtx.createOscillator(); const gain=audioCtx.createGain(); osc.type='sine'; osc.frequency.value=freq; gain.gain.setValueAtTime(.0001,audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(.045,audioCtx.currentTime+.05); gain.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+1.15); osc.connect(gain).connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime+1.2); activeOsc=osc; osc.onended=()=>{activeOsc=null; document.querySelectorAll('.sound').forEach(s=>s.classList.remove('playing'));}; }
+const sb=$('#soundboard'); sounds.forEach(([emoji,name,freq,desc])=>{ const b=document.createElement('button'); b.className='sound'; b.innerHTML=`<span class="emoji">${emoji}</span><strong>${name}</strong><p>${desc}</p>`; b.addEventListener('click',()=>{ document.querySelectorAll('.sound').forEach(s=>s.classList.remove('playing')); b.classList.add('playing'); beep(freq); }); sb.appendChild(b); });
+
+const quiz = [
+ {q:'You arrive at the resort. First move?', choices:['Inspect the room category','Find the spa','Take a photo, then overthink it','Stand near the ocean and reboot']},
+ {q:'A minor inconvenience appears.', choices:['Ask for a manager, politely-ish','Absorb everyone’s feelings','Make a cutting observation','Pretend it is character development']},
+ {q:'Vacation ideal?', choices:['Luxury with flawless logistics','Peace and a clean boundary','People-watching with notes','One honest moment outside the itinerary']}
+];
+let qi=0, score=[0,0,0,0];
+function renderQuiz(){ $('#quizQ').innerHTML=`<p><strong>${quiz[qi].q}</strong></p>`; $('#quizChoices').innerHTML=''; quiz[qi].choices.forEach((c,i)=>{ const b=document.createElement('button'); b.className='choice'; b.textContent=c; b.addEventListener('click',()=>{score[i]++; qi=(qi+1)%quiz.length; renderQuiz(); renderMood();}); $('#quizChoices').appendChild(b); }); }
+const moods=[['Room Upgrade Maximalist','Pair with sparkling water, pineapple, and the humility to accept that sometimes the room is just a room.'],['Spa Boundary Mystic','Pair with tea, dim lights, and a strict “no checking plot summaries” policy.'],['Poolside Anthropologist','Pair with a notebook and the restraint not to psychoanalyze your friends out loud.'],['Ocean Reboot Romantic','Pair with takeout, windows open, and a long stare at your own life choices.']];
+function renderMood(random=false){ let idx=random?Math.floor(Math.random()*4):score.indexOf(Math.max(...score)); $('#mood').innerHTML=`<strong>${moods[idx][0]}</strong><p>${moods[idx][1]}</p><p><b>Suggested watch rhythm:</b> two episodes, ten-minute decompression, then decide if you are emotionally insured for more.</p>`; }
+$('#randomPlan').addEventListener('click',()=>renderMood(true)); renderQuiz();
+
+const toast=$('#toast'); function showToast(t){ toast.textContent=t; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),1900); }
+$('#spoilerBtn').addEventListener('click',()=>showToast('Spoiler Shield remains ON. The bounty is safe.'));
+</script>
+</body>
+</html>
